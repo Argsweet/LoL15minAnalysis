@@ -43,7 +43,12 @@ After cleaning, our dataset consisted of **18472 rows and 19 columns**. These in
 
 Below is the head of the cleaned dataset:
 
-## INSERT HERE
+<iframe
+  src="assets/cleaned_head.html"
+  width="800"
+  height="300"
+  frameborder="0"
+></iframe>
 
 ### Univariate Analysis
 
