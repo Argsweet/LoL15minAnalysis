@@ -4,7 +4,7 @@ Author: Annabelle Guiditta
 
 ## Introduction
 
-**League of Legends** (also known as LoL), is a popular multiplayer online battle (MOBA) game developed and published by Riot Games, the creators of Valorant and Arcane. Well known as Riot's most sucessful game, LoL is world-known and renowned for its large Esports influence. The dataset this report will cover comes from [Oracle's Elixer](https://oracleselixir.com/about), a free to access collection of Datasets from the League competitive sphere since 2015. In particular, the dataset referenced in this report draws from the **2025 competitive season**.
+League of Legends (also known as LoL), is a popular multiplayer online battle (MOBA) game developed and published by Riot Games, the creators of Valorant and Arcane. Well known as Riot's most sucessful game, LoL is world-known and renowned for its large Esports influence. The dataset this report will cover comes from [Oracle's Elixer](https://oracleselixir.com/about), a free to access collection of Datasets from the League competitive sphere since 2015. In particular, the dataset referenced in this report draws from the **2025 competitive season**.
 
 This dataset provides information of each individual game, team, and player, recording statistics such as first blood, game length, number of kills, and results, culminating in a rich source of information for data analysis.
 
@@ -210,19 +210,16 @@ Despite introducing more models and testing hyperparameters, we don't see much o
 
 ## Fairness Analysis
 
----
+Since there are many more Minor league games in this dataset (14408 vs 3254), it may be possible that the model is biased towards the stats of those games, causing more error in the prediction of Major League games. Indeed, when comparing the accuracies of the model on the league tiers, we get different results. But was this difference just due to chance?
 
-Our analysis is guided by two core questions:
+To answer this, I developed a **permutation test** to see if the difference in accuracy is significant. The following are my hypotheses:
 
-> **Hypothesis Test**: Do minor leagues have a significantly higher mean absolute gold difference at 15 minutes than major leagues?
+- **Null Hypothesis**: The classifier's accuracy is the same for both Major and Minor Leagues, any differences are due to chance.
 
-This allows us to examine whether Tier 1 Major league games are more competitive and better balanced in early game than Minor league games, as measured by how close teams are in gold at the 15 minute mark.
+- **Alternative Hypothesis**: The classifier's accuracy is higher for Minor Leagues.
 
-> **Prediction**: Can we predict match outcome from 15 minute stats alone?
-
-This asks whether the early game truly sets the course for the rest of the match, or whether there is still significant room for comeback. If 15 minute stats are strong predictors of the final outcome, it suggests that early game advantages are decisive in professional play.
-
-Together, these questions paint a picture of how early game performance differs across leagues, and how much it ultimately matters.
+- **Test statistic**: Difference in accuracy (Minor minus Major)
+- **Significance level**: 0.05
 
 <iframe
   src="assets/fairness.html"
@@ -230,3 +227,5 @@ Together, these questions paint a picture of how early game performance differs 
   height="600"
   frameborder="0"
 ></iframe>
+
+With a p-value of **0.008**, we **reject the Null Hypothesis** under our Significance level of **0.05**. There appears to be a difference in the accuracy in our model between Major and Minor leagues. This outcome implies that our model predicts outcomes more accurately for games in Minor Leagues than Major Leagues
