@@ -33,22 +33,21 @@ After cleaning, our dataset consisted of **18472 rows and 19 columns**. These in
 
 ### Data Cleaning
 
-- only keps rows with team in the position column, filtered to only needed columns
-- converted results , , first pick to boolean types
-- dropped columns that were marked as partial in the datacompleteness column
-- converted date to datetime
-- manually developed the major, minor, and league splits based on an initial 'league' column
-- Developed the stat gold lead at 15, which identfied all rows that had a positive goldiffat15 for later analysis
-- Missingness: identified missingness in split and firstpick. Interestingly, rows with missingness in first pick also contained missing values for all picks
+To begin the data cleaning process, I reduced the amount of columns from the initial amount of 165 to only 19, focusing primarily on 15-minute statistics and important identifiers in the game, such as `result` and `league`. Then, I turned to the rows. In the Oracle's Elixer dataset, several columns are marked as having 'partial' completition in the `datacompleteness` column, indicating an incomplete collection of data. To best preserve the interests of my research question, I removed all rows marked as having 'partial' completion. Additionally, each recorded game in the dataframe consists of 12 rows - 5 for players of each team, and 2 for each teams aggregated statistics (denoted as 100 and 200). As we are interested in analyzing games from an aggregated point of view, I removed all rows where `participantid` did not equal either 100 or 200.
+
+Aside from basic data conversions, such as turning `results` into a Boolean column and converting `date` into a datetime column, I developed several columns to help aid my work later on. These include the `league_tier` column, where I manually developed the Major, Minor, and International Competition splits based on each row's `league`; as well as `gold_lead_at15`, a column that identifies all rows that had a positive `golddiffat15`, indicating that they had more gold at 15 minutes than the opposing side.
+
+Finally, I analyzed the missingness in my data, specifically in `split`, as this column didnt contribute much to the rest of the report, I decided to keep the Nan values as-is. Since 15% of the rows were missing `split`, dropping them would be unnecessary, whereas imputating a categorical column such as this wouldnt make much sense.
 
 Below is the head of the cleaned dataset:
 
-<iframe
-  src="assets/cleaned_head.html"
-  width="800"
-  height="300"
-  frameborder="0"
-></iframe>
+| participantid | result | league_tier | split  | date                | length | goldat15 |  xpat15 | csat15 | golddiffat15 | xpdiffat15 | csdiffat15 | killsat15 | deathsat15 | assistsat15 | opp_killsat15 | opp_assistsat15 | opp_deathsat15 | gold_lead_at15 |
+| ------------: | -----: | :---------- | :----- | :------------------ | -----: | -------: | ------: | -----: | -----------: | ---------: | ---------: | --------: | ---------: | ----------: | ------------: | --------------: | -------------: | :------------- |
+|           100 |  False | Minor       | Winter | 2025-01-11 11:11:24 |  15922 |   1498.0 | 28270.0 |  496.0 |      -3837.0 |     -469.0 |      -16.0 |       0.0 |        3.0 |         0.0 |           3.0 |             9.0 |            0.0 | False          |
+|           200 |   True | Minor       | Winter | 2025-01-11 11:11:24 |  15922 |   5335.0 | 28739.0 |  512.0 |       3837.0 |      469.0 |       16.0 |       3.0 |        0.0 |         9.0 |           0.0 |             0.0 |            3.0 | True           |
+|           100 |   True | Minor       | Winter | 2025-01-11 12:06:37 |  19222 |   8328.0 | 28393.0 |  497.0 |       5069.0 |     2014.0 |       64.0 |      10.0 |        6.0 |        20.0 |           5.0 |             8.0 |           10.0 | True           |
+|           200 |  False | Minor       | Winter | 2025-01-11 12:06:37 |  19222 |   3259.0 | 26379.0 |  433.0 |      -5069.0 |    -2014.0 |      -64.0 |       5.0 |       10.0 |         8.0 |          10.0 |            20.0 |            6.0 | False          |
+|           100 |  False | Minor       | Winter | 2025-01-11 13:07:47 |  17822 |   6828.0 | 31544.0 |  476.0 |        118.0 |     1990.0 |      -43.0 |      10.0 |        6.0 |        13.0 |           6.0 |            12.0 |           10.0 | True           |
 
 ### Univariate Analysis
 
@@ -94,17 +93,29 @@ Notably, Major league games tend to have **lower average kills and assists** at 
 
 ### MNAR Analysis
 
-#### MNAR Analysis
-
 **Missing Not at Random (MNAR)** refers to missingness that is based on the actual missing values themselves, such as high incomes being missing on a survey because people dont want to report them.
 
-In the **total Oracle's Elixir LoL dataset**, potential candidates for MNAR are the `ban` columns. Teams may choose not to ban certain champions or simply run out of time to choose, and thus bans may not be recorded precisely because no ban was made. Perhaps if we had a column called `bans_skipped` that denotes the total number of bans skipped in the setup phase, we could explain the missingness and make it MAR
+In the total Oracle's Elixir LoL dataset, potential candidates for MNAR are the `ban` columns. Teams may choose not to ban certain champions or simply run out of time to choose, and thus bans may not be recorded precisely because no ban was made. Perhaps if we had a column called `bans_skipped` that denotes the total number of bans skipped in the setup phase, we could explain the missingness and make it MAR
 
 That said, most missingness in the dataset we cleaned appears to be either **Missing by Design** (such as `goldat15` being absent when a game ends before 15 minutes) or **MAR** dependent on observed columns like `date` or `league`. We could not conclusively identify any of these columns were **MNAR**, as there is no strong evidence that the missing values depend on the values themselves rather than on other observed variables.
 
 ### MAR Analysis
 
 **Missing at Random (MAR)** refers to missingness that is not based on the missing values themselves, but is related to another column in the dataset. For example, political preference of a survey being missing for participants of younger ages, where missingness is explained by their age -- not their actual preference
+
+- split
+  \*15.4%
+- # lots of inconsistent values, some just labeled as split 1 2 or 3, others have terms like fina, spring, summer
+
+This pattern caused me to consider how it might be possible that the missingness of `split` depends on different league tiers. Minor leagues could have more missing splits due to being less organized and having less resources to record data. To investigate this, I used a permutation test
+
+> **Null Hypothesis**: Missingness in `split` does not depend on any column, and is MCAR
+
+> **Alternative Hypothesis**: Missingness in `split` is MAR, and depends on another column in the dataset
+
+If we find a single instance that proves the null hypothesis wrong, then we can conclude that `split` is MAR! Otherwise, we must test against all other columns to prove the null hypothesis is true
+
+- tested on league, got a p value of approx 0
 
 ## INSERT HERE
 
@@ -115,7 +126,10 @@ That said, most missingness in the dataset we cleaned appears to be either **Mis
   frameborder="0"
 ></iframe>
 
-##more here
+There appears to be a significant difference in the missingness of splits between major and minor leagues! This suggests that the missingness of `split` is likely related to `league_tier`, and not just due to random chance.
+Therefore, we will be concluding that the missingness of splits is likely **MAR**, since it appears to be related to an observable variable (league tier) in our dataset.
+
+On the other hand, lets investigate a column that `split` may not depend on, such as `golddiffat15`
 
 <iframe
   src="assets/MARFalse.html"
@@ -123,6 +137,8 @@ That said, most missingness in the dataset we cleaned appears to be either **Mis
   height="600"
   frameborder="0"
 ></iframe>
+
+Clearly, `split` does not seem to depend on `golddiffat15`, with a p-value of 1.0
 
 ## Hypothesis Testing
 
