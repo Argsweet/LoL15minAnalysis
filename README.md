@@ -68,7 +68,7 @@ To begin my bivariate analysis, I attempted to visualize some of the differences
 
 <iframe
   src="assets/bivar.html"
-  width="800"
+  width="100%"
   height="600"
   frameborder="0"
 ></iframe>
@@ -136,7 +136,6 @@ On the other hand, lets investigate a column that the missingness of `split` may
   height="600"
   frameborder="0"
 ></iframe>
-
 Clearly, the missingness of `split` does not seem to depend on `golddiffat15`, with a p-value of 1.0
 
 ## Hypothesis Testing
@@ -172,7 +171,6 @@ Since we only care about each individual game in this permutation test, we reduc
   height="600"
   frameborder="0"
 ></iframe>
-
 Based on the hypothesis test performed, with a **p-value of approximately 0**, there is overwhelming evidence against the Null hypothesis, we **reject it in favor of the alternative**. Minor leagues have a statistically significantly higher mean absolute gold difference at 15 minutes than Major leagues. This could perhaps suggest that Tier 1 professional leagues are indeed more competitive, with teams staying closer in gold throughout the early game.
 
 ## Framing a Prediction Problem
