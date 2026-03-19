@@ -64,7 +64,7 @@ This histogram of `goldat15` illustrates that the amount of gold teams accumulat
 
 ### Bivariate Analysis
 
-To begin my bivariate analysis, I attempted to visualize some of the differences between Major and Minor Leagues.
+To begin my bivariate analysis, I attempted to visualize some of the differences between **Major and Minor Leagues**.
 
 <iframe
   src="assets/bivar.html"
@@ -73,19 +73,26 @@ To begin my bivariate analysis, I attempted to visualize some of the differences
   frameborder="0"
 ></iframe>
 
-To account for the difference in the number of Major vs Minor league games, I constructed a density histogram to fairly compare the distribution of `golddiffat15` across both tiers. Notably, the Major league distribution has a much sharper and higher peak, suggesting that gold differences in Tier 1 games are more tightly concentrated around 0. Major league games fall mostly between **-5,000 and 5,000 gold**, while Minor league games span a noticeably wider range of roughly **-7,000 to 7,000 gold**. This visual difference is supported by further calculations -- Minor league games exhibit **~73.7% more variance** in `golddiffat15` than Major league games, suggesting a more volatile early game landscape where leads are larger and less evenly matched. This sets the stage for our hypothesis test, where we formally investigate whether this difference is statistically significant.
+To account for the difference in the number of Major vs Minor league games, I constructed a density histogram to fairly compare the distribution of `golddiffat15` across both tiers. Notably, the Major league distribution has a much **sharper and higher peak**, suggesting that gold differences in Tier 1 games are more tightly concentrated around 0. Major league games fall mostly between **-5,000 and 5,000 gold**, while Minor league games span a noticeably wider range of roughly **-7,000 to 7,000 gold**. This visual difference is supported by further calculations -- Minor league games exhibit **~73.7% more variance** in `golddiffat15` than Major league games, suggesting a more volatile early game landscape where leads are larger and less evenly matched. This sets the stage for our hypothesis test, where we formally investigate whether this difference is statistically significant.
 
 ### Interesting Aggregates
 
-In investigating the importance of a gold lead early on in the game, I developed this grouped table to visualize its impact
+In investigating the importance of a **gold lead** early on in the game, I developed this grouped table to visualize its impact
 
-## INSERT HERE
+| result |   xpat15 | killsat15 | assistsat15 | csat15 | gold_lead_at15 |
+| :----- | -------: | --------: | ----------: | -----: | -------------: |
+| False  | 27294.42 |      2.93 |        3.22 |   5.41 |         508.72 |
+| True   | 27307.08 |      8.45 |        7.09 |   9.70 |         529.11 |
 
 In particlar, it can be noted that teams that have a gold lead at 15 minutes tend to win more, and have higher xp, kills, assists, and creep score! In fact, **73% of teams** that had a gold lead at 15 minutes ended up winning the round
 
 Additionally, I wanted to investigate the mean values across the different league tiers
 
-## INSERT HERE
+| league_tier   | goldat15 |   xpat15 | killsat15 | assistsat15 | csat15 |
+| :------------ | -------: | -------: | --------: | ----------: | -----: |
+| International | 25084.89 | 30262.37 |      4.32 |        7.50 | 526.85 |
+| Major         | 24688.91 | 30111.87 |      3.23 |        5.89 | 534.58 |
+| Minor         | 25036.93 | 30057.36 |      4.75 |        7.93 | 514.94 |
 
 Notably, Major league games tend to have **lower average kills and assists** at 15 minutes compared to both Minor and International leagues. This aligns with the expectation that Tier 1 games are more defensive and methodical in the early game. Interestingly, Major leagues have a slightly **higher average CS** (534 vs 514), suggesting that while Major league teams fight less, they farm more efficiently.
 
@@ -103,21 +110,13 @@ That said, most missingness in the dataset we cleaned appears to be either **Mis
 
 **Missing at Random (MAR)** refers to missingness that is not based on the missing values themselves, but is related to another column in the dataset. For example, political preference of a survey being missing for participants of younger ages, where missingness is explained by their age -- not their actual preference
 
-- split
-  \*15.4%
-- # lots of inconsistent values, some just labeled as split 1 2 or 3, others have terms like fina, spring, summer
+In our dataset, I observed several missing values in `split` -- infact, **15.4%** of rows had missing values for this column. Upon further investigation, split appeared to have many **inconsistent values and names** for games played in the same period, with some leagues using labels like Split 1, 2 or 3, whereas others used ones such as Winter Spring, and Summer.
 
-This pattern caused me to consider how it might be possible that the missingness of `split` depends on different league tiers. Minor leagues could have more missing splits due to being less organized and having less resources to record data. To investigate this, I used a permutation test
+This pattern caused me to consider if the missingness of `split` might depend on **different league tiers**. Minor leagues could have more missing splits due to being less organized and having less resources to record data. To investigate this, I used a permutation test to determine whether the missingness of `split` was truly MCAR or could be MAR on some column in our dataset.
 
-> **Null Hypothesis**: Missingness in `split` does not depend on any column, and is MCAR
+By just finding a **single instance** of the missingness of `split` having significant correlation with another column, then we can conclude that the missingness of `split` is MAR! Otherwise, we must test against all other columns to to determine if it was MCAR.
 
-> **Alternative Hypothesis**: Missingness in `split` is MAR, and depends on another column in the dataset
-
-If we find a single instance that proves the null hypothesis wrong, then we can conclude that `split` is MAR! Otherwise, we must test against all other columns to prove the null hypothesis is true
-
-- tested on league, got a p value of approx 0
-
-## INSERT HERE
+First, I tested on `league` using a permutation test with Total Variation Distance (TVD) as my test statistic.
 
 <iframe
   src="assets/MARTrue.html"
@@ -126,10 +125,10 @@ If we find a single instance that proves the null hypothesis wrong, then we can 
   frameborder="0"
 ></iframe>
 
-There appears to be a significant difference in the missingness of splits between major and minor leagues! This suggests that the missingness of `split` is likely related to `league_tier`, and not just due to random chance.
-Therefore, we will be concluding that the missingness of splits is likely **MAR**, since it appears to be related to an observable variable (league tier) in our dataset.
+There appears to be a **significant difference** in the missingness of splits between major and minor leagues! With a p-value of approximately 0, this test suggests that the missingness of `split` is likely related to `league_tier`, and not just due to random chance.
+Therefore, we can conclude that the missingness of splits is likely **MAR**, since it appears to be related to an observable variable (league tier) in our dataset.
 
-On the other hand, lets investigate a column that `split` may not depend on, such as `golddiffat15`
+On the other hand, lets investigate a column that the missingness of `split` may not depend on, such as `golddiffat15`
 
 <iframe
   src="assets/MARFalse.html"
@@ -138,13 +137,13 @@ On the other hand, lets investigate a column that `split` may not depend on, suc
   frameborder="0"
 ></iframe>
 
-Clearly, `split` does not seem to depend on `golddiffat15`, with a p-value of 1.0
+Clearly, the missingness of `split` does not seem to depend on `golddiffat15`, with a p-value of 1.0
 
 ## Hypothesis Testing
 
-In the Oracle's Elixer LoL Dataset, each row has a column labeled **`league`**, denoting professional playing leagues that teams get matched and play in. Earlier in our cleaning step, we denoted a league as a "Major" league if it was from LCK, LEC, LCP, LTA N, LTA S, or LTA.
+In the Oracle's Elixer LoL Dataset, each row has a column labeled **`league`**, denoting professional playing leagues that teams get matched and play in. Earlier in our cleaning step, we denoted a league as a "Major" league if it was from **LCK, LEC, LCP, LTA N, LTA S, or LTA.**
 
-Tier 1 Professional leagues, such as those above, are seen as more competitive -- leading to highly technical games with close stats between teams. In my hypothesis test, I wish to discover whether games played at a Major Tier 1 Professional Leagues have smaller gold differences between teams than Minor Leagues do.
+Tier 1 Professional leagues, such as those above, are seen as more competitive -- leading to highly technical games with **close stats between teams**. In my hypothesis test, I wish to discover whether games played at a Major Tier 1 Professional Leagues have **smaller gold differences** between teams than Minor Leagues do.
 
 **Null Hypothesis**: Major (LCK, LEC, LCP, LTA N, LTA S, LTA) and minor leagues have the same mean absolute gold difference at 15 minutes and come from the same distribution
 
@@ -152,11 +151,13 @@ Tier 1 Professional leagues, such as those above, are seen as more competitive -
 
 **Test Statistic**: Difference in absoluted gold differences between games in Major Leagues vs Minor Leagues
 
-$$|\overline{\text{Gold Diff at 15 Minutes - Minor}}| - |\overline{\text{Gold Diff at 15 Minutes - Major}}|$$
+<script type="math/tex; mode=display">
+|\overline{\text{Gold Diff at 15 Minutes - Minor}}| - |\overline{\text{Gold Diff at 15 Minutes - Major}}|
+</script>
 
 **Significance Level**: 1%
 
-As this hypothesis seeks to detemine whether two populations come from the same distribution, we used a permuation test to investigate this difference.
+As this hypothesis seeks to detemine whether two populations **come from the same distribution**, we used a **permuation test** to investigate this difference.
 
 In our dataset, there are 2 rows per game — one for the Red Team (Participant ID 200) and one for the Blue Team (Participant ID 100).
 Each team has a value for **`golddiffat15`**, which denotes the gold difference between teams at 15 minutes. The value is mirrored across both rows, with one team's value being negative (implying they have less gold).
