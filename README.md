@@ -225,9 +225,10 @@ To answer this, I developed a **permutation test** to see if the difference in a
 
 <iframe
   src="assets/fairness.html"
-  width="800"
+  width="100%"
   height="600"
   frameborder="0"
+  style="display: block; margin: 0 auto;"
 ></iframe>
 
 With a p-value of **0.008**, we **reject the Null Hypothesis** under our Significance level of **0.05**. There appears to be a difference in the accuracy in our model between Major and Minor leagues. This outcome implies that our model predicts outcomes more accurately for games in Minor Leagues than Major Leagues
