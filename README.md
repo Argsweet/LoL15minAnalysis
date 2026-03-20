@@ -241,7 +241,7 @@ To answer this, I developed a **permutation test** to see if the difference in a
 <iframe
   src="assets/fairness.html"
   width="100%"
-  height="600"
+  height="500"
   frameborder="0"
 ></iframe>
 
