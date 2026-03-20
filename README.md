@@ -64,17 +64,12 @@ Below is the head of the cleaned dataset:
 
 To begin the exploration of my dataset, I investigated the distribution of Gold at the **15 minute** mark.
 
-<div style="text-align: center;">
-    <iframe
-    src="assets/univar.html"
-    width="100%"
-    height="500"
-    frameborder="0"
-    style="display: block; margin: 0 auto; border: none;"
-
-    ></iframe>
-
-</div>
+<iframe
+  src="assets/univar.html"
+  width="100%"
+  height="500"
+  frameborder="0"
+></iframe>
 
 This histogram of `goldat15` illustrates that the amount of gold teams accumulate by 15 minutes follows a roughly normal distribution, centered a bit under **25,000 gold**. The shape is noticeably right-skewed, with most teams falling between **22,000 and 28,000 gold** at the 15 minute mark. This distribution suggests that gold accumulation at 15 minutes is fairly consistent across professional games, with extreme values on either end being rare. In the context of our research question, this histogram helps establish what a "typical" 15 minute gold value looks like, providing a baseline for understanding how meaningful deviations from this range might be in predicting match outcomes.
 
@@ -87,7 +82,6 @@ To begin my bivariate analysis, I attempted to visualize some of the differences
   width="100%"
   height="500"
   frameborder="0"
-  style="display: block; margin: 0 auto; border: none;"
 ></iframe>
 
 To account for the difference in the number of Major vs Minor league games, I constructed a density histogram to fairly compare the distribution of `golddiffat15` across both tiers. Notably, the Major league distribution has a much **sharper and higher peak**, suggesting that gold differences in Tier 1 games are more tightly concentrated around 0. Major league games fall mostly between **-5,000 and 5,000 gold**, while Minor league games span a noticeably wider range of roughly **-7,000 to 7,000 gold**. This visual difference is supported by further calculations -- Minor league games exhibit **~73.7% more variance** in `golddiffat15` than Major league games, suggesting a more volatile early game landscape where leads are larger and less evenly matched. This sets the stage for our hypothesis test, where I formally investigate whether this difference is statistically significant.
@@ -138,7 +132,7 @@ First, I tested on `league` using a permutation test with Total Variation Distan
 <iframe
   src="assets/MARTrue.html"
   width="780"
-  height="500"
+  height="550"
   frameborder="0"
 ></iframe>
 
@@ -188,6 +182,7 @@ Since we only care about each individual game in this permutation test, we reduc
   height="600"
   frameborder="0"
 ></iframe>
+
 Based on the hypothesis test performed, with a **p-value of approximately 0**, there is overwhelming evidence against the Null hypothesis, **we reject the Null in favor of the Alternative**. Minor leagues have a statistically significantly higher mean absolute gold difference at 15 minutes than Major leagues. This could perhaps suggest that Tier 1 professional leagues are indeed more competitive, with teams staying closer in gold throughout the early game.
 
 ## Framing a Prediction Problem
@@ -248,7 +243,6 @@ To answer this, I developed a **permutation test** to see if the difference in a
   width="100%"
   height="600"
   frameborder="0"
-  style="display: block; margin: 0 auto;"
 ></iframe>
 
 With a p-value of **0.008**, we **reject the Null Hypothesis** under our Significance level of **0.05**. There appears to be a difference in the accuracy in our model between Major and Minor leagues. This outcome implies that our model predicts outcomes more accurately for games in Minor Leagues than Major Leagues
